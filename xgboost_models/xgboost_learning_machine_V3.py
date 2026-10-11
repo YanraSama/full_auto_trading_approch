@@ -39,7 +39,7 @@ def learning_data_classifier(CSV_FILE, LEARNING_OUT):
 
     feature_cols = [
         'day_of_week', 'hour', 'minutes', 'trend',
-        'rr', 'chart_patern', 'strat_trend',
+        'rr', 'anticipation', 'chart_patern', 'strat_trend',
         'patern_candle', 'analyse_area', 'hedge_strat', 'sma_50',
         'sma_200', 'bollinger', 
         'atr',
