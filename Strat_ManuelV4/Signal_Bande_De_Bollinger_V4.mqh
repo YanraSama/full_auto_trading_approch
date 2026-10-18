@@ -59,34 +59,39 @@ bool Signal_Bande_De_Bolingers(ushort IendPatern, bool Mode_H_L){
 }
 
 
-bool info_Signal_Bande_De_Bolingers(ushort IendPatern, bool Mode_H_L){
+double info_Signal_Bande_De_Bolingers(ushort IendPatern, bool Mode_H_L, double &widthBB){
 
    //initialisation de la BB basse
    double LowerBB = 0.0;
    //initialisation de la BB haute
    double UpperBB = 0.0;
-      
+   //initialisation de la BB du millieu
+   double MidBB = 0.0;
+   
+   double smRatio = 0;
+   double buffer_Ratio = 0;
+   double Average_R = 0;
  
-      for(ushort e = 1; e < IendPatern; e++)
-        {
-            LowerBB =iBands(symbol_opti, Period_EEP, 20, 2, 0, BB_APLIED, MODE_LOWER, e);
-            UpperBB =iBands(symbol_opti, Period_EEP, 20, 2, 0, BB_APLIED, MODE_UPPER, e);
+   double smWidth = 0;
+   double buffer_width = 0;
+ 
+   for(ushort e = 1; e < IendPatern; e++)
+   {
+      LowerBB =iBands(symbol_opti, Period_EEP, 20, 2, 0, BB_APLIED, MODE_LOWER, e);
+      UpperBB =iBands(symbol_opti, Period_EEP, 20, 2, 0, BB_APLIED, MODE_UPPER, e);
+      MidBB   =iBands(symbol_opti, Period_EEP, 20, 2, 0, BB_APLIED, MODE_MAIN, e);
+         
+      smRatio += (iClose(symbol_opti, Period_EEP, e)-MidBB)/(UpperBB-LowerBB);
+      buffer_Ratio ++;
+      
+      smWidth += (UpperBB - LowerBB)/ iClose(symbol_opti, Period_EEP, e) *100;
+      buffer_width ++;
+   }
+  Average_R = (buffer_Ratio > 0) ? smRatio/buffer_Ratio : 0;
+  widthBB   = (buffer_width > 0) ? smWidth/buffer_width : 0;
+  
+  return Average_R;
 
-         if(Mode_H_L == true)
-           {
-            if(iLow(symbol_opti, Period_EEP, e) < LowerBB)
-               return true;
-           }
-         else
-            if(Mode_H_L == false)
-           {
-            if(iHigh(symbol_opti, Period_EEP, e) > UpperBB) 
-              return true;
-           }
-        }
-        return false;
-
-   return false;
 }
    
 #endif 

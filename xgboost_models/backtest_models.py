@@ -34,10 +34,10 @@ def add_signal(BACKTEST_FILE):
                      
     feature_cols = [
         'day_of_week', 'hour', 'minutes', 'trend',
-        'rr', 'anticipation', 'chart_patern', 'strat_trend',
+        'rr', 'side', 'anticipation', 'chart_patern', 'strat_trend',
         'patern_candle', 'analyse_area', 'hedge_strat', 'sma_50',
-        'sma_200', 'bollinger', 
-        'atr',
+        'sma_200', 'alignement_tendances', 'bollinger', 'width_BB',
+        'vol_rel', 'atr', 'rsi',
     ]
 
     # df['imbalance_flow'] = df['imbalance'] * df['ratio_flow']
@@ -99,8 +99,8 @@ def add_signal(BACKTEST_FILE):
 
     #df["pred_EV"] = reg_EV.predict(X)
 
+    #df["entry_signal"] = calibrator.predict(regressor_proba.predict_proba(X)[:, 1])
     df["entry_signal"] = regressor_proba.predict_proba(X)[:, 1]
-
     # ================= Sauvegarde =================
 
     df.to_csv(

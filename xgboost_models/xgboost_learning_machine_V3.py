@@ -39,10 +39,10 @@ def learning_data_classifier(CSV_FILE, LEARNING_OUT):
 
     feature_cols = [
         'day_of_week', 'hour', 'minutes', 'trend',
-        'rr', 'anticipation', 'chart_patern', 'strat_trend',
+        'rr', 'side', 'anticipation', 'chart_patern', 'strat_trend',
         'patern_candle', 'analyse_area', 'hedge_strat', 'sma_50',
-        'sma_200', 'bollinger', 
-        'atr',
+        'sma_200', 'alignement_tendances', 'bollinger', 'width_BB',
+        'vol_rel', 'atr', 'rsi',
     ]
 
     # ====================== FILTRE QUALITÉ ======================
@@ -111,9 +111,9 @@ def learning_data_classifier(CSV_FILE, LEARNING_OUT):
             colsample_bynode      = 0.70,
             reg_alpha             = 0.5,
             reg_lambda            = 1.0,
-            scale_pos_weight      = ratio*1.5,
+            scale_pos_weight      = ratio,
             tree_method           = "hist",
-            eval_metric           = "logloss",  # ← garder logloss
+            eval_metric           = "logloss",  
             early_stopping_rounds = 30,
             random_state          = 42,
             n_jobs                = -1,

@@ -35,10 +35,10 @@ def learning_data_classifier(CSV_FILE, LEARNING_OUT):
 
     feature_cols = [
         'day_of_week', 'hour', 'minutes', 'trend',
-        'rr', 'anticipation', 'chart_patern', 'strat_trend',
+        'rr', 'side', 'anticipation', 'chart_patern', 'strat_trend',
         'patern_candle', 'analyse_area', 'hedge_strat', 'sma_50',
-        'sma_200', 'bollinger', 
-        'atr',
+        'sma_200', 'alignement_tendances', 'bollinger', 'width_BB',
+        'vol_rel', 'atr', 'rsi',
     ]
 
     # ====================== FILTRE QUALITÉ ======================
@@ -216,7 +216,7 @@ def learning_data_classifier(CSV_FILE, LEARNING_OUT):
 
                 tree_method="hist",
 
-                eval_metric="auc",
+                eval_metric="logloss",
 
                 early_stopping_rounds=30,
 
