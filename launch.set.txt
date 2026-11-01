@@ -1,0 +1,12 @@
+  ; open chart and run expert and/or script
+  ExpertsEnable=true
+  ExpertsDllImport=true
+  ExpertsExpImport=true
+  ExpertsTrades=true
+  Symbol=EURUSD
+  Period=M5
+  Template=popular.tpl
+  Expert=Strategie_SemiManuelRS_V4\Stategy_SemiManuelRS_V4
+  ExpertParameters=macd.set
+  Script=period_converter
+  ScriptParameters==per_conv.set

@@ -1,0 +1,23 @@
+;ExpertsEnable=true
+;ExpertsDllImport=true
+;ExpertsExpImport=true
+;ExpertsTrades=true
+;Symbol=GBPUSD
+;Period=M15
+;Template=popular.tpl
+;Expert=MACD Sample
+;ExpertParameters=macd.set
+; start strategy tester
+TestExpert=Strategie_SemiManuelRS_V4\Stategy_SemiManuelRS_V4
+TestExpertParameters=SE.set
+TestSymbol=GBPUSD
+TestPeriod=M5
+TestModel=2
+TestSpread=10
+TestOptimization=true
+TestDateEnable=true
+TestFromDate=2026.09.09
+TestToDate=2026.09.12
+TestReplaceReport=false
+TestShutdownTerminal=true
+TestVisualEnable=false

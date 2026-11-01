@@ -8,8 +8,6 @@ import threading
 from datetime import date
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from xgboost_learning_machine_V3_3 import learning_data_classifier
-from backtest_models import add_signal
 
 def open_MT4 ( mt4, caches, file_parameter, opti_num, wait=True ):
     mt4_path = mt4

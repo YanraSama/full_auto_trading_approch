@@ -24,7 +24,7 @@ import joblib
 """
 # ================= Chargement =================
 
-def add_signal(BACKTEST_FILE):
+def add_signal(BACKTEST_FILE, MODEL_FILE):
     
     print ("lancement prédiction ...")
 
@@ -82,7 +82,12 @@ def add_signal(BACKTEST_FILE):
     #reg_TTP = joblib.load("xgboost_regressor_ttp.pkl")
     #reg_TTPDD = joblib.load("xgboost_regressor_ttp_DD.pkl")
     #reg_EV = joblib.load("xgboost_regressor_ev.pkl")
-    regressor_proba = joblib.load("xgboost_model_v3_target.pkl")
+
+    package = joblib.load(MODEL_FILE)
+    model = package['model']
+    feature_cols = package['features']
+    optimal_threshold = package['optimal_threshold']
+    
     #calibrator = joblib.load("xgboost_model_v3_target_calibrator.pkl")
 
     # ================= Prédictions =================
@@ -100,7 +105,7 @@ def add_signal(BACKTEST_FILE):
     #df["pred_EV"] = reg_EV.predict(X)
 
     #df["entry_signal"] = calibrator.predict(regressor_proba.predict_proba(X)[:, 1])
-    df["entry_signal"] = regressor_proba.predict_proba(X)[:, 1]
+    df["entry_signal"] = model.predict_proba(X)[:, 1]
     # ================= Sauvegarde =================
 
     df.to_csv(
@@ -113,4 +118,4 @@ def add_signal(BACKTEST_FILE):
     print("Prédictions terminées.")
 
 
-add_signal("datas_models.csv")
+#add_signal("datas_models_1.csv", "xgboost_model_v3_package.pkl")
