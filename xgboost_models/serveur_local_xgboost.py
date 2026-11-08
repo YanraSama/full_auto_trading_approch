@@ -7,7 +7,8 @@ import csv
 
 app = Flask(__name__)
 
-MODEL = joblib.load("xgboost_model_v3_target.pkl")
+package = None
+statut  = True
 FEATURES = [
         'day_of_week', 'hour', 'minutes', 'trend',
         'rr', 'side', 'anticipation', 'chart_patern', 'strat_trend',
@@ -31,6 +32,7 @@ def health():
 
 @app.route("/predict",  methods=["GET", "POST"])
 def predict():
+    global statut
     data = request.json
     if data is None:
         print(f"Erreur : JSON manquant dans la requête {request.data}", flush=True)
@@ -43,26 +45,63 @@ def predict():
         time.sleep(1)
         return jsonify({"status": "processing test completed"})
 
-    row = [float(data.get(f, 0)) for f in FEATURES]
+    model = package['model']
+    feature_cols = package['features']
+    optimal_threshold = package['optimal_threshold']
+
+    row = [float(data.get(f, 0)) for f in feature_cols]
     X = np.array([row])
 
-    #proba = float(CALIBRATOR.predict(MODEL.predict_proba(X)[:, 1]))
-    proba = float(MODEL.predict_proba(X)[0, 1])
+    print(f"Test de traitement en cours...  {feature_cols}", flush=True)
 
-    signal = 1 if proba >= 0.00 else 0
+    proba = float(model.predict_proba(X)[0, 1])
 
-    #if signal == 1:
-    #    with open(CSV_BACKTEST, "a", newline="", encoding="utf-8-sig") as f:
-    #        writer = csv.writer(f, delimiter=";")
-    #
-    #        writer.writerow([proba])
+    signal = 1 if proba >= optimal_threshold else 0
 
     print(f"Prediction : proba={proba}, signal={signal}", flush=True)
 
+    statut = True
+
+    print(f"Pack : {package}", flush=True)
     return jsonify({
         "proba": round(proba, 4),
         "signal": signal,
-        "features_used": len(FEATURES)
+        "features_used": len(feature_cols)
+    })
+
+
+@app.route("/asset",  methods=["GET", "POST"])
+def asset():
+    global package
+    global statut
+
+    if statut != True:
+        print(f"Process en cours ... {statut}", flush=True)
+        return jsonify({"error": "Attendre un peu et reessayer"}), 400
+
+    data = request.json
+    if data is None:
+        print(f"Erreur : JSON manquant dans la requête {request.data}", flush=True)
+        return jsonify({"error": "JSON manquant"}), 400
+
+    print(f"Requête reçue : {data}", flush=True)
+
+    if (data == "PROCESSING TEST.."):
+        print("Test de traitement en cours...", flush=True)
+        time.sleep(1)
+        return jsonify({"status": "processing test completed"})
+
+    filename = f"xgboost_model_v3_package{data}.pkl"
+
+    package = joblib.load(filename)
+    statut  = False
+
+    print(package, flush=True)
+
+    return jsonify({
+        "status": "success",
+        "asset": data,
+        "filename": filename
     })
 
 if __name__ == "__main__":
