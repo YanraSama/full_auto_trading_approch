@@ -1,0 +1,9 @@
+; open chart and run expert and/or script
+ExpertsEnable=true
+ExpertsDllImport=true
+ExpertsExpImport=true
+ExpertsTrades=true
+Symbol=GBPUSD
+Period=M5
+Template=popular.tpl
+Script=f
