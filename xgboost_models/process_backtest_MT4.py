@@ -109,15 +109,14 @@ def find_good_folder (dossier_principal, under_folder, which_terminal = False, a
 
 #-------------------------------------------------------------------------------------------------------------
 
-def process_MT4():
+def process_MT4(test_asset, spread):
     path_absolute              = r"C:\Users"
     folder_in_users            = find_good_folder(path_absolute, "full_auto_trading_approch")
     folder_in_project          = find_good_folder(path_absolute + folder_in_users, "xgboost_models")
-    path_num                   = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "tester")
+    path_num                   = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "start")
+    path_launch                = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "launch")
     path_file_set              = path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num + r"\tester" + r"\SE.set"
     path_file_start            = path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num + r"\start.txt"
-    test_asset                 = "GBPUSD"
-    spread                     = "12"
     date_two_month_ago         = (date.today() - relativedelta(months=2)).strftime("%Y.%m.%d")
     date_now                   = date.today().strftime("%Y.%m.%d")
     date_two_years_ago         = (date.today() - relativedelta(months=4)).strftime("%Y.%m.%d")
@@ -187,7 +186,7 @@ def process_MT4():
 
     for x in range(nbr_files):
         seuil.append(learning_data_classifier(f"datas_models_{x+1}.csv", f"xgboost_model_v3_package_{x+1}.pkl")) 
-        print ("SEUIL : ", seuil[x])
+        print ("SEUIL : ", seuil[x], "   ", x+1, "   ", nbr_files)
  
     for x in range(nbr_files):
         add_signal(f"datas_models_{x+1}.csv", f"xgboost_model_v3_package_{x+1}.pkl")
@@ -211,6 +210,8 @@ def process_MT4():
             print("⚠️ Colonne win_rate introuvable, aucune filtration appliquée")
             dt_filtered = df.copy()
 
+        
+
         perf_backtest = df_filtered["resultat"].sum()
         perf_forward = dt_filtered["resultat"].sum()
 
@@ -223,7 +224,8 @@ def process_MT4():
         best_config = max(best_set, key=lambda row: row[1])
         print("BEST CONF : ", best_config[0], best_config[1])
     else:
-        print("⚠️ Aucune configuration valide trouvée (aucun backtest positif ou forward insuffisant).")
+        print("⚠️ Aucune configuration valide trouvée (aucun backtest positif ou forward insuffisant) : ", perf_backtest, "    ", seuil, "     ", best_set, "      ", perf_forward)
+        suppression(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num + r"\tester\files")
         return False
 
     source = f"xgboost_model_v3_package_{best_config[0]}.pkl"
@@ -262,7 +264,7 @@ def process_MT4():
 
     print ("FINAL SET : ", final_set)
 
-    déplacer_fichier(Path(path_absolute + folder_in_users + folder_in_project + r"\xgboost_models"), Path(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num + r"\MQL4\Presets"), f"bot_{test_asset}.set")
+    déplacer_fichier(Path(path_absolute + folder_in_users + folder_in_project + r"\xgboost_models"), Path(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_launch + r"\MQL4\Presets"), f"bot_{test_asset}.set")
     print (f"Fichier bot_{test_asset}.set prêt à ètre lancé")
 
     suppression(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num + r"\tester\files")
@@ -273,8 +275,8 @@ def lancement_bot(file_set, symbol):
 
     path_absolute              = r"C:\Users"
     folder_in_users            = find_good_folder(path_absolute, "full_auto_trading_approch")
-    path_num                   = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "tester")
-    path_file_set              = path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num
+    path_launch                = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "launch")
+    path_file_set              = path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_launch
 
     path_final = path_file_set + r"\launch.txt"
 
@@ -285,7 +287,7 @@ def lancement_bot(file_set, symbol):
 
     modify_text_file(path_final,  final_set, True)
 
-    process = subprocess.Popen([ r"C:\Program Files (x86)\FTMO Global Markets MT4 Terminal\terminal.exe","launch.txt"])
+    process = subprocess.Popen([ r"C:\Program Files (x86)\FTMO Global Markets MT4 Terminal - 2\terminal.exe","launch.txt"])
     return True
 
 
@@ -297,9 +299,43 @@ def suppression(dossier):
         for f in Path(dossier).glob(motif):
             f.unlink()
 
+def browse_chart(test_asset):
 
-if  (process_MT4()):
-  if (lancement_bot ("bot_GBPUSD.set", "GBPUSD")):
-      print ("Process terminé, bot lancé")
+    path_absolute              = r"C:\Users"
+    folder_in_users            = find_good_folder(path_absolute, "full_auto_trading_approch")
+    path_num                   = find_good_folder(path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal", "start")
+    path_file_set              = path_absolute + folder_in_users + r"\AppData\Roaming\MetaQuotes\Terminal" + path_num
+
+    path_final = path_file_set + r"\browse_charts.txt"
+
+    final_set = [
+        ["Symbol", test_asset],
+    ]
+
+    modify_text_file(path_final,  final_set, True)
+    process = subprocess.Popen([ r"C:\Program Files (x86)\FTMO Global Markets MT4 Terminal\terminal.exe","browse_charts.txt"])
+    print("MT4 Browse Chart lancé.\t\t")
+
+
+    process.wait()      # Attendre que MT4 se termine
+    print("MT4 Browse Chart terminé.")    
+    
+    return True
+
+
+asset_tab = [
+               {"currency" : "GBPUSD", "spread" : 12}, {"currency" : "EURUSD", "spread" : 10}]#, {"currency" : "USDJPY", "spread" : 10}, {"currency" : "AUDUSD", "spread" : 10}, {"currency" : "USDCAD", "spread" : 15}, {"currency" : "NZDUSD", "spread" : 10}, {"currency" : "EURGBP", "spread" : 10}, {"currency" : "EURJPY", "spread" : 10}, {"currency" : "GBPJPY", "spread" : 20}, {"currency" : "AUDJPY", "spread" : 10},
+               #{"currency" : "AUDCAD", "spread" : 15}, {"currency" : "AUDCHF", "spread" : 12}, {"currency" : "AUDNZD", "spread" : 18}, {"currency" : "CADCHF", "spread" : 12}, {"currency" : "CADJPY", "spread" : 12}, {"currency" : "CHFJPY", "spread" : 25}, {"currency" : "EURAUD", "spread" : 18}, {"currency" : "EURCAD", "spread" : 18}, {"currency" : "EURNZD", "spread" : 23}, {"currency" : "GBPAUD", "spread" : 18},
+               #{"currency" : "GBPCAD", "spread" : 15}, {"currency" : "GBPCHF", "spread" : 15}, {"currency" : "NZDCAD", "spread" : 15}, {"currency" : "NZDCHF", "spread" : 15}, {"currency" : "NZDJPY", "spread" : 12}, 
+            #]
+
+for asset in asset_tab:
+
+    browse_chart(asset["currency"])
+
+    if  (process_MT4(asset["currency"], asset["spread"])):
+   
+        if (lancement_bot ("bot_" + asset["currency"] + ".set", asset["currency"])):
+            print ("Process terminé, bot lancé")
 
 #nbr_forward_files = déplacer_fichier(Path(r"C:\Users\rayan\AppData\Roaming\MetaQuotes\Terminal\56EE5B2C68594C11EBC44B2E705CB8B7\tester\files"), Path(r"C:\Users\rayan\Desktop\full_auto_trading_approch\xgboost_models"), "forward_datas_*")
